@@ -42,6 +42,10 @@ class IRacingAdapter(GameAdapter):
         gear = self.ir['Gear'] or 0
         # iRacing Gears: -1 = Reverse, 0 = Neutral, 1-N = Forward
         
+        # Steering Angle
+        # iRacing 'SteeringWheelAngle' is in radians. Positive is usually left (CCW).
+        steering_angle = self.ir['SteeringWheelAngle'] or 0.0
+        
         is_on_track = self.ir['IsOnTrack']
         
         return TelemetryData(
@@ -51,5 +55,6 @@ class IRacingAdapter(GameAdapter):
             rpm=rpm,
             speed_kph=speed_kph,
             gear=gear,
+            steering_angle=steering_angle,
             active=bool(is_on_track)
         )

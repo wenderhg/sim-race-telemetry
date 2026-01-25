@@ -77,7 +77,7 @@ class OverlayWindow(QWidget):
         self.graph.update_data(data.throttle, data.brake)
         self.bars.update_data(data.clutch, data.brake, data.throttle)
         if self.dashboard_visible:
-            self.dashboard.update_data(data.gear, data.speed_kph, data.rpm)
+            self.dashboard.update_data(data.gear, data.speed_kph, data.rpm, data.steering_angle)
 
     def change_scale(self, delta):
         new_scale = self.current_scale + delta

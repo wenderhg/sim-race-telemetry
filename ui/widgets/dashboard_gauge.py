@@ -1,3 +1,4 @@
+import math
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel
 from PySide6.QtCore import Qt, QRect, QPoint
 from PySide6.QtGui import QPainter, QPen, QColor
@@ -10,13 +11,15 @@ class DashboardGaugeWidget(QWidget):
         self.gear = 0
         self.speed = 0
         self.rpm_pct = 0.0 # 0.0 to 1.0
+        self.steering_angle = 0.0
 
         self.setStyleSheet("background-color: transparent;")
 
-    def update_data(self, gear, speed, rpm, max_rpm=8000):
+    def update_data(self, gear, speed, rpm, steering_angle=0.0, max_rpm=8000):
         self.gear = gear
         self.speed = int(speed)
         self.rpm_pct = min(1.0, rpm / max_rpm)
+        self.steering_angle = steering_angle
         self.update()
 
     def paintEvent(self, event):
@@ -39,18 +42,44 @@ class DashboardGaugeWidget(QWidget):
         logical_rect = QRect(0, 0, 100, 100)
         
         c = QPoint(50, 50)
-        radius = 45 # 100/2 - 5
         
-        # Background Circle
+        # Radii definitions
+        outer_radius = 45 # For Steering
+        inner_radius = 35 # For RPM/Background (shrunk to make room)
+        
+        # Background Circle (Inner)
         painter.setPen(Qt.NoPen)
         painter.setBrush(QColor(0, 0, 0, 200))
-        painter.drawEllipse(c, radius, radius)
+        painter.drawEllipse(c, inner_radius, inner_radius)
+
+        # Steering Indicator (Outer Track)
+        # Visual guide for the track (optional, maybe a faint ring?)
+        painter.setPen(QPen(QColor(50, 50, 50, 100), 1))
+        painter.setBrush(Qt.NoBrush)
+        painter.drawEllipse(c, outer_radius, outer_radius)
+
+        # Steering Marker
+        painter.save()
+        painter.translate(c)
+        deg = math.degrees(self.steering_angle)
+        painter.rotate(-deg) 
         
-        # RPM Arc (Background)
+        # Draw marker at outer radius
+        marker_y = -outer_radius 
+        painter.setBrush(QColor(0, 100, 255)) # Blue
+        painter.setPen(Qt.NoPen)
+        painter.drawEllipse(QPoint(0, marker_y), 4, 4)
+        
+        painter.restore()
+        
+        # RPM Arc (Background) - Inner Radius
         painter.setPen(QPen(QColor(50, 50, 50), 6))
         painter.setBrush(Qt.NoBrush)
-        # 10,10,-10,-10 inset from 0,0,100,100 -> 10,10 width 80 height 80
-        arc_rect = logical_rect.adjusted(10, 10, -10, -10)
+        # Calculate rect for inner radius
+        # logical_rect is 0,0,100,100. Center 50,50.
+        # radius 35 means rect from 15,15 to 85,85. Width/Height = 70.
+        # inset = 50 - 35 = 15.
+        arc_rect = logical_rect.adjusted(15, 15, -15, -15)
         painter.drawArc(arc_rect, -45 * 16, 270 * 16)
 
         # RPM Arc (Active)

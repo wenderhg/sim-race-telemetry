@@ -38,12 +38,16 @@ class MockAdapter(GameAdapter):
         elif self.speed < 130: self.gear = 4
         else: self.gear = 5
 
+        # Steering angle simulation (sine wave, +/- 180 degrees approx in radians)
+        steering_angle = math.sin(t * 0.5) * (math.pi) 
+
         return TelemetryData(
             throttle=throttle,
             brake=brake,
             clutch=clutch,
             rpm=rpm,
             speed_kph=self.speed,
+            steering_angle=steering_angle,
             gear=self.gear,
             active=True
         )

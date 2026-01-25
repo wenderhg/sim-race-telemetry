@@ -8,6 +8,7 @@ class TelemetryData:
     clutch: float = 0.0    # 0.0 to 1.0
     rpm: float = 0.0
     speed_kph: float = 0.0
+    steering_angle: float = 0.0 # radians, 0 = center, positive = left? Need to check convention. Usually CCW is positive.
     gear: int = 0          # 0 = N, -1 = R, 1-N = Gears
     active: bool = False   # True if game is active/driving
 
