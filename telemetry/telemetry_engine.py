@@ -4,6 +4,7 @@ from PySide6.QtCore import QObject, Signal
 from .adapters.base import GameAdapter, TelemetryData
 from .adapters.mock import MockAdapter
 from .adapters.iracing import IRacingAdapter
+from .adapters.assetto_corsa import AssettoCorsaAdapter
 
 class TelemetryEngine(QObject):
     data_updated = Signal(object) # Emits TelemetryData
@@ -13,6 +14,7 @@ class TelemetryEngine(QObject):
         # Initialize adapters list
         self.mock_adapter = MockAdapter()
         self.iracing_adapter = IRacingAdapter()
+        self.ac_adapter = AssettoCorsaAdapter()
         
         # Default to Mock, but we can have a logic to auto-switch
         # For this stage, let's use a simple strategy:
@@ -45,22 +47,28 @@ class TelemetryEngine(QObject):
             
             data = None
             
-            # Auto-detection logic (simplified)
-            # Check iRacing
+            # Auto-detection logic
+            
+            # 1. Check iRacing
             if not self.iracing_adapter.connected:
                 # Try to connect
-                self.iracing_adapter.update() # This attempts startup inside
+                self.iracing_adapter.update() 
             
             if self.iracing_adapter.connected:
                 data = self.iracing_adapter.update()
-                if not data.active:
-                    # Connected but not on track could still be valid, or maybe fallback?
-                    # Let's show the data even if not active (e.g. in pits)
-                    pass
-            else:
+            
+            # 2. Check Assetto Corsa (if iRacing not active)
+            if not data:
+                if not self.ac_adapter.connected:
+                    self.ac_adapter.update() # Try connect
+                
+                if self.ac_adapter.connected:
+                    data = self.ac_adapter.update()
+
+            # 3. Fallback to Mock
+            if not data:
                 # Fallback to Mock so we have visuals
                 data = self.mock_adapter.update()
-                # Indicate it's mock data? We might want a UI flag, but for now just show it.
 
             if data:
                 self.data_updated.emit(data)

@@ -31,8 +31,8 @@ class VerticalBar(QWidget):
         self.label.setText(str(val_int))
 
     def update_style(self, scale):
-        width = int(15 * scale)
-        font_size = max(8, int(10 * scale)) # Minimum readable font
+        width = int(10 * scale)
+        font_size = max(6, int(6 * scale)) # Minimum readable font
         
         self.label.setStyleSheet(f"color: white; font-weight: bold; font-size: {font_size}px;")
         self.bar.setStyleSheet(f"""

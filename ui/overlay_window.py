@@ -14,7 +14,7 @@ class OverlayWindow(QWidget):
         self.dashboard_visible = True
         
         self.setWindowTitle("Sim Racing Overlay")
-        self.resize(800, 150)
+        self.resize(512, 96)
         
         # Window Flags
         self.setWindowFlags(
@@ -32,14 +32,14 @@ class OverlayWindow(QWidget):
         
         # 1. Telemetry Strip (Left)
         self.strip = QLabel("TELEMETRY")
-        self.strip.setFixedWidth(30)
+        self.strip.setFixedWidth(19)
         self.strip.setAlignment(Qt.AlignCenter)
         self.strip.setStyleSheet("""
             background-color: #111;
             color: white;
-            border-left: 3px solid red;
+            border-left: 2px solid red;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 8px;
         """)
         # Rotate text? Standard QLabel doesn't rotate easily. 
         # For prototype we'll keep it simple vertical text or just horizontal.
@@ -67,8 +67,8 @@ class OverlayWindow(QWidget):
         
         # Scaling State
         self.current_scale = 1.0 # 100%
-        self.base_width = 800
-        self.base_height = 150
+        self.base_width = 512
+        self.base_height = 96
 
         # Init functionality
         self.update_lock_state()
@@ -90,19 +90,19 @@ class OverlayWindow(QWidget):
         self.current_scale = new_scale
         
         # Scale Strip
-        new_strip_width = int(30 * new_scale)
-        new_font_size = max(8, int(12 * new_scale))
+        new_strip_width = int(19 * new_scale)
+        new_font_size = max(6, int(8 * new_scale))
         self.strip.setFixedWidth(new_strip_width)
         self.strip.setStyleSheet(f"""
             background-color: #111;
             color: white;
-            border-left: {max(1, int(3*new_scale))}px solid red;
+            border-left: {max(1, int(2*new_scale))}px solid red;
             font-weight: bold;
             font-size: {new_font_size}px;
         """)
         
         # Scale Dashboard
-        dash_size = int(100 * new_scale)
+        dash_size = int(64 * new_scale)
         self.dashboard.setFixedSize(dash_size, dash_size)
 
         # Scale Input Bars
